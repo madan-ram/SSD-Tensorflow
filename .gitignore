@@ -22,3 +22,8 @@ nohup.out
 ssd-tensorflow.sublime-workspace
 ssd-tensorflow.sublime-project
 
+datasets/VOCdevkit/
+checkpoints/ssd_300_vgg.ckpt/
+
+.DS_Store
+*.pyc

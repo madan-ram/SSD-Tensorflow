@@ -1,0 +1,4 @@
+1. Learn how each commponent can be modified, clear about the concepts.
+2. Print every leayer, with name, with, theoretical receptive field. (In-Procgress)
+3. Change layer to accomodate dilated layer, its and filed of view. 
+4. Get data from Generation script data from Ridhima.

@@ -66,7 +66,7 @@ def get_split(split_name, dataset_dir, file_pattern, reader,
     """
     if split_name not in split_to_sizes:
         raise ValueError('split name %s was not recognized.' % split_name)
-    file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
+    file_pattern = os.path.join(dataset_dir, file_pattern)
 
     # Allowing None in the signature so that dataset_factory can use the default.
     if reader is None:

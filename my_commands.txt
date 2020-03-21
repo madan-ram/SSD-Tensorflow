@@ -1,0 +1,43 @@
+To create dataset
+DATASET_DIR=datasets/VOCdevkit/VOC2012/validation
+OUTPUT_DIR=datasets/VOCdevkit/tf/validation
+python tf_convert_data.py \
+    --dataset_name=pascalvoc \
+    --dataset_dir=${DATASET_DIR} \
+    --output_name=voc_2012 \
+    --output_dir=${OUTPUT_DIR}
+
+
+To train model
+
+DATASET_DIR=datasets/VOCdevkit/tf/train
+TRAIN_DIR=./logs/
+python train_ssd_doc_network.py \
+    --train_dir=${TRAIN_DIR} \
+    --dataset_dir=${DATASET_DIR} \
+    --dataset_name=pascalvoc_2012 \
+    --dataset_split_name=train \
+    --model_name=ssd_vgg_doc \
+    --save_summaries_secs=60 \
+    --save_interval_secs=600 \
+    --weight_decay=0.0005 \
+    --optimizer=adam \
+    --learning_rate=0.001 \
+    --batch_size=32
+
+
+
+To evalute
+
+DATASET_DIR=datasets/VOCdevkit/tf/validation/
+EVAL_DIR=logs/validation
+CHECKPOINT_PATH=logs/ 
+python eval_ssd_network.py \
+    --eval_dir=${EVAL_DIR} \
+    --dataset_dir=${DATASET_DIR} \
+    --checkpoint_path=${CHECKPOINT_PATH} \
+    --dataset_name=pascalvoc_2012 \
+    --dataset_split_name=test \
+    --model_name=ssd_vgg_doc \
+    --batch_size=32
+

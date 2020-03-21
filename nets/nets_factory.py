@@ -27,10 +27,12 @@ from nets import vgg
 
 from nets import ssd_vgg_300
 from nets import ssd_vgg_512
+from nets import ssd_vgg_doc
 
 slim = tf.contrib.slim
 
 networks_map = {'vgg_a': vgg.vgg_a,
+                'ssd_vgg_doc': ssd_vgg_doc.ssd_net,
                 'vgg_16': vgg.vgg_16,
                 'vgg_19': vgg.vgg_19,
                 'ssd_300_vgg': ssd_vgg_300.ssd_net,
@@ -40,6 +42,7 @@ networks_map = {'vgg_a': vgg.vgg_a,
                 }
 
 arg_scopes_map = {'vgg_a': vgg.vgg_arg_scope,
+                  'ssd_vgg_doc': ssd_vgg_doc.ssd_arg_scope,
                   'vgg_16': vgg.vgg_arg_scope,
                   'vgg_19': vgg.vgg_arg_scope,
                   'ssd_300_vgg': ssd_vgg_300.ssd_arg_scope,
@@ -50,6 +53,7 @@ arg_scopes_map = {'vgg_a': vgg.vgg_arg_scope,
 
 networks_obj = {'ssd_300_vgg': ssd_vgg_300.SSDNet,
                 'ssd_512_vgg': ssd_vgg_512.SSDNet,
+                'ssd_vgg_doc': ssd_vgg_doc.SSDNet,
                 }
 
 

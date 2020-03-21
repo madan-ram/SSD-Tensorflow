@@ -19,7 +19,7 @@ from datasets import pascalvoc_common
 
 slim = tf.contrib.slim
 
-FILE_PATTERN = 'voc_2012_%s_*.tfrecord'
+FILE_PATTERN = 'voc_2012_*.tfrecord'
 ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying height and width.',
     'shape': 'Shape of the image',
@@ -52,7 +52,8 @@ TRAIN_STATISTICS = {
     'total': (11540, 27450),
 }
 SPLITS_TO_SIZES = {
-    'train': 17125,
+    'train': 13759,
+    'test': 3366
 }
 SPLITS_TO_STATISTICS = {
     'train': TRAIN_STATISTICS,
@@ -79,6 +80,8 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
     """
     if not file_pattern:
         file_pattern = FILE_PATTERN
+
+    print(SPLITS_TO_SIZES)
     return pascalvoc_common.get_split(split_name, dataset_dir,
                                       file_pattern, reader,
                                       SPLITS_TO_SIZES,
