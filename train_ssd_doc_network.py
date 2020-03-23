@@ -235,10 +235,10 @@ def main(_):
                                                              'object/label',
                                                              'object/bbox'])
             # Pre-processing image, labels and bboxes.
-            image, glabels, gbboxes = \
-                image_preprocessing_fn(image, glabels, gbboxes,
+            image, glabels, gbboxes = image_preprocessing_fn(image, glabels, gbboxes,
                                        out_shape=ssd_shape,
                                        data_format=DATA_FORMAT)
+
             # Encode groundtruth labels and bboxes.
             gclasses, glocalisations, gscores = \
                 ssd_net.bboxes_encode(glabels, gbboxes, ssd_anchors)
