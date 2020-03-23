@@ -268,10 +268,10 @@ def preprocess_for_train(image, labels, bboxes,
 
         # Distort image and bounding boxes.
         dst_image = image
-        dst_image, labels, bboxes, distort_bbox = \
-            distorted_bounding_box_crop(image, labels, bboxes,
-                                        min_object_covered=MIN_OBJECT_COVERED,
-                                        aspect_ratio_range=CROP_RATIO_RANGE)
+        # dst_image, labels, bboxes, distort_bbox = \
+        #     distorted_bounding_box_crop(image, labels, bboxes,
+        #                                 min_object_covered=MIN_OBJECT_COVERED,
+        #                                 aspect_ratio_range=CROP_RATIO_RANGE)
         # Resize image to output size.
         dst_image = tf_image.resize_image(dst_image, out_shape,
                                           method=tf.image.ResizeMethod.BILINEAR,
@@ -279,14 +279,15 @@ def preprocess_for_train(image, labels, bboxes,
         tf_summary_image(dst_image, bboxes, 'image_shape_distorted')
 
         # Randomly flip the image horizontally.
-        dst_image, bboxes = tf_image.random_flip_left_right(dst_image, bboxes)
+        # dst_image, bboxes = tf_image.random_flip_left_right(dst_image, bboxes)
 
         # Randomly distort the colors. There are 4 ways to do it.
-        dst_image = apply_with_random_selector(
-                dst_image,
-                lambda x, ordering: distort_color(x, ordering, fast_mode),
-                num_cases=4)
-        tf_summary_image(dst_image, bboxes, 'image_color_distorted')
+        # dst_image = apply_with_random_selector(
+        #         dst_image,
+        #         lambda x, ordering: distort_color(x, ordering, fast_mode),
+        #         num_cases=4)
+        dst_image = tf.image.random_brightness(dst_image, 0.35)
+        tf_summary_image(dst_image, bboxes, 'image_brightness_distorted')
 
         # Rescale to VGG input scale.
         image = dst_image * 255.
@@ -320,38 +321,38 @@ def preprocess_for_eval(image, labels, bboxes,
 
         # Add image rectangle to bboxes.
         bbox_img = tf.constant([[0., 0., 1., 1.]])
-        if bboxes is None:
-            bboxes = bbox_img
-        else:
-            bboxes = tf.concat([bbox_img, bboxes], axis=0)
+        # if bboxes is None:
+        #     bboxes = bbox_img
+        # else:
+        #     bboxes = tf.concat([bbox_img, bboxes], axis=0)
 
-        if resize == Resize.NONE:
-            # No resizing...
-            pass
-        elif resize == Resize.CENTRAL_CROP:
-            # Central cropping of the image.
-            image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
-                image, bboxes, out_shape[0], out_shape[1])
-        elif resize == Resize.PAD_AND_RESIZE:
-            # Resize image first: find the correct factor...
-            shape = tf.shape(image)
-            factor = tf.minimum(tf.to_double(1.0),
-                                tf.minimum(tf.to_double(out_shape[0] / shape[0]),
-                                           tf.to_double(out_shape[1] / shape[1])))
-            resize_shape = factor * tf.to_double(shape[0:2])
-            resize_shape = tf.cast(tf.floor(resize_shape), tf.int32)
+        # if resize == Resize.NONE:
+        #     # No resizing...
+        #     pass
+        # elif resize == Resize.CENTRAL_CROP:
+        #     # Central cropping of the image.
+        #     image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
+        #         image, bboxes, out_shape[0], out_shape[1])
+        # elif resize == Resize.PAD_AND_RESIZE:
+        #     # Resize image first: find the correct factor...
+        #     shape = tf.shape(image)
+        #     factor = tf.minimum(tf.to_double(1.0),
+        #                         tf.minimum(tf.to_double(out_shape[0] / shape[0]),
+        #                                    tf.to_double(out_shape[1] / shape[1])))
+        #     resize_shape = factor * tf.to_double(shape[0:2])
+        #     resize_shape = tf.cast(tf.floor(resize_shape), tf.int32)
 
-            image = tf_image.resize_image(image, resize_shape,
-                                          method=tf.image.ResizeMethod.BILINEAR,
-                                          align_corners=False)
-            # Pad to expected size.
-            image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
-                image, bboxes, out_shape[0], out_shape[1])
-        elif resize == Resize.WARP_RESIZE:
-            # Warp resize of the image.
-            image = tf_image.resize_image(image, out_shape,
-                                          method=tf.image.ResizeMethod.BILINEAR,
-                                          align_corners=False)
+        #     image = tf_image.resize_image(image, resize_shape,
+        #                                   method=tf.image.ResizeMethod.BILINEAR,
+        #                                   align_corners=False)
+        #     # Pad to expected size.
+        #     image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
+        #         image, bboxes, out_shape[0], out_shape[1])
+        # elif resize == Resize.WARP_RESIZE:
+        #     # Warp resize of the image.
+        #     image = tf_image.resize_image(image, out_shape,
+        #                                   method=tf.image.ResizeMethod.BILINEAR,
+        #                                   align_corners=False)
 
         # Split back bounding boxes.
         bbox_img = bboxes[0]

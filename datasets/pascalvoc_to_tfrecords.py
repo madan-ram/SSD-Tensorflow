@@ -66,7 +66,16 @@ DIRECTORY_IMAGES = 'JPEGImages/'
 RANDOM_SEED = 4242
 SAMPLES_PER_FILES = 200
 
+def negative_to_zero(val):
+    if val<0.0:
+        return 0.0
+    return val
 
+def above_1_to_1(val):
+    if val>1.0:
+        return 1.0
+    return val
+    
 def _process_image(directory, name):
     """Process a image and annotation file.
 
@@ -100,12 +109,12 @@ def _process_image(directory, name):
     truncated = []
     label = 0
     for obj in root.findall('object'):
-        label = obj.find('name').text
+        # label = obj.find('name').text
         # HACK: Remove it for correct output
         labels.append(label)
         label = label+1
         # labels.append(int(VOC_LABELS[label][0]))
-        labels_text.append(label.encode('ascii'))
+        labels_text.append(str(label).encode('ascii'))
 
         if obj.find('difficult'):
             difficult.append(int(obj.find('difficult').text))
@@ -117,11 +126,12 @@ def _process_image(directory, name):
             truncated.append(0)
 
         bbox = obj.find('bndbox')
-        bboxes.append((float(bbox.find('ymin').text) / shape[0],
+        bboxes.append(tuple(map(above_1_to_1, map(negative_to_zero, [float(bbox.find('ymin').text) / shape[0],
                        float(bbox.find('xmin').text) / shape[1],
                        float(bbox.find('ymax').text) / shape[0],
                        float(bbox.find('xmax').text) / shape[1]
-                       ))
+                       ]))))
+
     return image_data, shape, bboxes, labels, labels_text, difficult, truncated
 
 
