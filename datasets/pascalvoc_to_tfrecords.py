@@ -98,9 +98,13 @@ def _process_image(directory, name):
     labels_text = []
     difficult = []
     truncated = []
+    label = 0
     for obj in root.findall('object'):
         label = obj.find('name').text
-        labels.append(int(VOC_LABELS[label][0]))
+        # HACK: Remove it for correct output
+        labels.append(label)
+        label = label+1
+        # labels.append(int(VOC_LABELS[label][0]))
         labels_text.append(label.encode('ascii'))
 
         if obj.find('difficult'):
