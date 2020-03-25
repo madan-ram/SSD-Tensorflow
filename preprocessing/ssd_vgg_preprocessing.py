@@ -261,11 +261,6 @@ def preprocess_for_train(image, labels, bboxes,
             image = tf.image.convert_image_dtype(image, dtype=tf.float32)
         tf_summary_image(image, bboxes, 'image_with_bboxes')
 
-        # Remove DontCare labels.
-        labels, bboxes = ssd_common.tf_bboxes_filter_labels(out_label,
-                                                            labels,
-                                                            bboxes)
-       
         if resize == Resize.NONE:
             # No resizing...
             pass
