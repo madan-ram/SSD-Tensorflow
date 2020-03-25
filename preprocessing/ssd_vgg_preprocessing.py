@@ -298,7 +298,7 @@ def preprocess_for_train(image, labels, bboxes,
         #                                   method=tf.image.ResizeMethod.BILINEAR,
         #                                   align_corners=False)
 
-        tf_summary_image(dst_image, bboxes, 'image_resized')
+        tf_summary_image(dst_image, bboxes, 'image_shape_distorted')
 
         dst_image = tf.image.random_brightness(dst_image, 0.35)
         tf_summary_image(dst_image, bboxes, 'image_brightness_distorted')
