@@ -23,10 +23,10 @@ from preprocessing import preprocessing_factory
 import tf_utils
 
 import config_info
+DATA_FORMAT = config_info.DATA_FORMAT
 
 slim = config_info.slim
 
-DATA_FORMAT = config_info.DATA_FORMAT
 
 # =========================================================================== #
 # SSD Network flags.

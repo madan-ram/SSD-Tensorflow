@@ -87,7 +87,7 @@ def plt_bboxes(img, classes, scores, bboxes, figsize=(10,10), linewidth=1.5):
     """Visualize bounding boxes. Largely inspired by SSD-MXNET!
     """
     fig = plt.figure(figsize=figsize)
-    plt.imshow(img)
+    plt.imshow(img, cmap='gray',clim=(0,1))
     height = img.shape[0]
     width = img.shape[1]
     colors = dict()
