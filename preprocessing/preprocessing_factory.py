@@ -54,7 +54,7 @@ def get_preprocessing(name, is_training=False):
         raise ValueError('Preprocessing name [%s] was not recognized' % name)
 
     def preprocessing_fn(image, labels, bboxes,
-                         out_shape, data_format='NHWC', resize=preprocessing_fn_map[name].PAD_AND_RESIZE, **kwargs):
+                         out_shape, data_format='NHWC', resize=preprocessing_fn_map[name].Resize.PAD_AND_RESIZE, **kwargs):
         return preprocessing_fn_map[name].preprocess_image(
             image, labels, bboxes, out_shape, data_format=data_format,
             is_training=is_training, resize=resize, **kwargs)
