@@ -43,17 +43,13 @@ tf.app.flags.DEFINE_string(
     'output_dir', './',
     'Output directory where to store TFRecords files.')
 
-
 def main(_):
     if not FLAGS.dataset_dir:
         raise ValueError('You must supply the dataset directory with --dataset_dir')
     print('Dataset directory:', FLAGS.dataset_dir)
     print('Output directory:', FLAGS.output_dir)
 
-    if FLAGS.dataset_name == 'pascalvoc':
-        pascalvoc_to_tfrecords.run(FLAGS.dataset_dir, FLAGS.output_dir, FLAGS.output_name)
-    else:
-        raise ValueError('Dataset [%s] was not recognized.' % FLAGS.dataset_name)
+    pascalvoc_to_tfrecords.run(FLAGS.dataset_dir, FLAGS.output_dir, FLAGS.dataset_name, FLAGS.output_name)
 
 if __name__ == '__main__':
     tf.app.run()

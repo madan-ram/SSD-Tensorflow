@@ -1,8 +1,8 @@
 To create dataset
-DATASET_DIR=datasets/VOCdevkit/VOC2012/validation
-OUTPUT_DIR=datasets/VOCdevkit/tf/validation
+DATASET_DIR=/Users/madanram/SoulOfCoder/SSD-Tensorflow/datasets/VOC2012/train/
+OUTPUT_DIR=/Users/madanram/SoulOfCoder/SSD-Tensorflow/datasets/VOC2012/tf/
 python tf_convert_data.py \
-    --dataset_name=pascalvoc \
+    --dataset_name=avt_2020_v1 \
     --dataset_dir=${DATASET_DIR} \
     --output_name=voc_2012 \
     --output_dir=${OUTPUT_DIR}
@@ -46,6 +46,10 @@ var startClickConnect = function startClickConnect(){
 };
 
 var stopClickConnect = startClickConnect();
+
+
+
+
 
 To evalute
 

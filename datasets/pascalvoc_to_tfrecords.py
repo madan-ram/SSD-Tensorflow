@@ -56,7 +56,7 @@ import tensorflow as tf
 import xml.etree.ElementTree as ET
 
 from datasets.dataset_utils import int64_feature, float_feature, bytes_feature
-from datasets.pascalvoc_common import VOC_LABELS
+from datasets.avt_2020_v1 import VOC_LABELS
 
 # Original dataset organisation.
 DIRECTORY_ANNOTATIONS = 'Annotations/'
@@ -107,13 +107,12 @@ def _process_image(directory, name):
     labels_text = []
     difficult = []
     truncated = []
-    label = 0
     for obj in root.findall('object'):
-        # label = obj.find('name').text
+        label = obj.find('name').text
         # HACK: Remove it for correct output
-        labels.append(label)
-        label = label+1
-        # labels.append(int(VOC_LABELS[label][0]))
+        # labels.append(label)
+        # label = label+1
+        labels.append(int(VOC_LABELS[label][0]))
         labels_text.append(str(label).encode('ascii'))
 
         if obj.find('difficult'):
@@ -179,19 +178,19 @@ def _convert_to_example(image_data, labels, labels_text, bboxes, shape,
     return example
 
 
-def _add_to_tfrecord(dataset_dir, name, tfrecord_writer):
-    """Loads data from image and annotations files and add them to a TFRecord.
+# def _add_to_tfrecord(dataset_dir, name, tfrecord_writer):
+#     """Loads data from image and annotations files and add them to a TFRecord.
 
-    Args:
-      dataset_dir: Dataset directory;
-      name: Image name to add to the TFRecord;
-      tfrecord_writer: The TFRecord writer to use for writing.
-    """
-    image_data, shape, bboxes, labels, labels_text, difficult, truncated = \
-        _process_image(dataset_dir, name)
-    example = _convert_to_example(image_data, labels, labels_text,
-                                  bboxes, shape, difficult, truncated)
-    tfrecord_writer.write(example.SerializeToString())
+#     Args:
+#       dataset_dir: Dataset directory;
+#       name: Image name to add to the TFRecord;
+#       tfrecord_writer: The TFRecord writer to use for writing.
+#     """
+#     image_data, shape, bboxes, labels, labels_text, difficult, truncated = \
+#         _process_image(dataset_dir, name)
+#     example = _convert_to_example(image_data, labels, labels_text,
+#                                   bboxes, shape, difficult, truncated)
+#     tfrecord_writer.write(example.SerializeToString())
 
 
 def _get_output_filename(output_dir, name, idx):
@@ -216,6 +215,7 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
         random.shuffle(filenames)
 
     # Process dataset files.
+    count_num_exp = 0
     i = 0
     fidx = 0
     while i < len(filenames):
@@ -229,12 +229,18 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
 
                 filename = filenames[i]
                 img_name = filename[:-4]
-                _add_to_tfrecord(dataset_dir, img_name, tfrecord_writer)
+
+                image_data, shape, bboxes, labels, labels_text, difficult, truncated = _process_image(dataset_dir, img_name)
+                example = _convert_to_example(image_data, labels, labels_text,
+                                              bboxes, shape, difficult, truncated)
+                tfrecord_writer.write(example.SerializeToString())
+                count_num_exp += 1
                 i += 1
                 j += 1
             fidx += 1
 
+    print("\nNumer of samples %d"%count_num_exp)
     # Finally, write the labels file:
     # labels_to_class_names = dict(zip(range(len(_CLASS_NAMES)), _CLASS_NAMES))
     # dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
-    print('\nFinished converting the Pascal VOC dataset!')
+    print('Finished converting the Pascal VOC dataset!')
