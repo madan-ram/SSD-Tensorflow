@@ -196,7 +196,8 @@ def main(_):
             clone_on_cpu=FLAGS.clone_on_cpu,
             replica_id=0,
             num_replicas=1,
-            num_ps_tasks=0)
+            num_ps_tasks=0
+        )
         # Create global_step.
         with tf.device(deploy_config.variables_device()):
             global_step = slim.create_global_step()
