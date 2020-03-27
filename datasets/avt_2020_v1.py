@@ -21,7 +21,7 @@ from datasets import dataset_utils
 
 slim = tf.contrib.slim
 
-NUM_CLASSES = 5
+NUM_CLASSES = 4
 FILE_PATTERN = 'avt_2020_v1_*.tfrecord'
 ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying height and width.',
