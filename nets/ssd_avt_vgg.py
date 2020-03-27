@@ -41,6 +41,25 @@ from nets import ssd_common
 slim = tf.contrib.slim
 # ssd_net.default_image_size = 1024
 
+# =========================================================================== #
+# Functional definition of VGG-based SSD 300.
+# =========================================================================== #
+def tensor_shape(x, rank=3):
+    """Returns the dimensions of a tensor.
+    Args:
+      image: A N-D Tensor of shape.
+    Returns:
+      A list of dimensions. Dimensions that are statically known are python
+        integers,otherwise they are integer scalar tensors.
+    """
+    if x.get_shape().is_fully_defined():
+        return x.get_shape().as_list()
+    else:
+        static_shape = x.get_shape().with_rank(rank).as_list()
+        dynamic_shape = tf.unstack(tf.shape(x), rank)
+        return [s if s is not None else d
+                for s, d in zip(static_shape, dynamic_shape)]
+                
 def ssd_multibox_layer(inputs,
                        num_classes,
                        sizes,
