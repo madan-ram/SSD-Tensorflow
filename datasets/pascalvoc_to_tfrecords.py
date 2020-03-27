@@ -109,6 +109,9 @@ def _process_image(directory, name):
     truncated = []
     for obj in root.findall('object'):
         label = obj.find('name').text
+        # Skill unlabelled object
+        if label == 'unlabelled' or label is None:
+            continue
         # HACK: Remove it for correct output
         # labels.append(label)
         # label = label+1
