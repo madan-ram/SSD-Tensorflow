@@ -38,6 +38,9 @@ import tf_extended as tfe
 from nets import custom_layers
 from nets import ssd_common
 
+slim = tf.contrib.slim
+# ssd_net.default_image_size = 1024
+
 def ssd_multibox_layer(inputs,
                        num_classes,
                        sizes,
@@ -67,9 +70,6 @@ def ssd_multibox_layer(inputs,
    cls_pred = tf.reshape(cls_pred,
                        tensor_shape(cls_pred, 4)[:-1]+[num_anchors, num_classes])
    return cls_pred, loc_pred
-
-slim = tf.contrib.slim
-ssd_net.default_image_size = 1024
 
 # =========================================================================== #
 # SSD class definition.
