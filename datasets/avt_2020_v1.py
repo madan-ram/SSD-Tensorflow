@@ -136,5 +136,5 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
     return _get_split(split_name, dataset_dir,
                                       file_pattern, reader,
                                       SPLITS_TO_SIZES,
-                                      ITEMS_TO_DESCRIPTIONS)
+                                      ITEMS_TO_DESCRIPTIONS, num_classes)
 
