@@ -48,7 +48,6 @@ def main(_):
         raise ValueError('You must supply the dataset directory with --dataset_dir')
     print('Dataset directory:', FLAGS.dataset_dir)
     print('Output directory:', FLAGS.output_dir)
-
     pascalvoc_to_tfrecords.run(FLAGS.dataset_dir, FLAGS.output_dir, FLAGS.dataset_name, FLAGS.output_name)
 
 if __name__ == '__main__':
