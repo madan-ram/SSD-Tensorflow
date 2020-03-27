@@ -33,9 +33,7 @@ VOC_LABELS = {
     'InvoiceDate': (0, 'date'),
     'InvoiceTable': (1, 'table'),
     'InvoiceDescription': (2, 'string'),
-    'InvoiceAmount': (3, 'number'),
-    'unlabelled': (5, 'NA'),
-    None: (5, 'NA'),
+    'InvoiceAmount': (3, 'number')
 }
 
 # Percentage sums to 1
