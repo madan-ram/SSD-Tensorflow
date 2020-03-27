@@ -28,6 +28,7 @@ from nets import vgg
 from nets import ssd_vgg_300
 from nets import ssd_vgg_512
 from nets import ssd_vgg_doc
+from nets import ssd_avt_vgg
 
 slim = tf.contrib.slim
 
@@ -39,6 +40,9 @@ networks_map = {'vgg_a': vgg.vgg_a,
                 'ssd_300_vgg_caffe': ssd_vgg_300.ssd_net,
                 'ssd_512_vgg': ssd_vgg_512.ssd_net,
                 'ssd_512_vgg_caffe': ssd_vgg_512.ssd_net,
+
+                'ssd_avt_vgg': ssd_vgg_512.ssd_net,
+                'ssd_avt_vgg': ssd_vgg_512.ssd_net,
                 }
 
 arg_scopes_map = {'vgg_a': vgg.vgg_arg_scope,
@@ -47,13 +51,15 @@ arg_scopes_map = {'vgg_a': vgg.vgg_arg_scope,
                   'vgg_19': vgg.vgg_arg_scope,
                   'ssd_300_vgg': ssd_vgg_300.ssd_arg_scope,
                   'ssd_300_vgg_caffe': ssd_vgg_300.ssd_arg_scope_caffe,
-                  'ssd_512_vgg': ssd_vgg_512.ssd_arg_scope,
-                  'ssd_512_vgg_caffe': ssd_vgg_512.ssd_arg_scope_caffe,
+                  
+                  'ssd_avt_vgg': ssd_avt_vgg.ssd_arg_scope,
+                  'ssd_avt_vgg_caffe': ssd_avt_vgg.ssd_arg_scope_caffe,
                   }
 
 networks_obj = {'ssd_300_vgg': ssd_vgg_300.SSDNet,
                 'ssd_512_vgg': ssd_vgg_512.SSDNet,
                 'ssd_vgg_doc': ssd_vgg_doc.SSDNet,
+                'ssd_avt_vgg': ssd_avt_vgg.SSDNet,
                 }
 
 
