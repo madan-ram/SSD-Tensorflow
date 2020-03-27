@@ -21,6 +21,7 @@ from datasets import dataset_utils
 
 slim = tf.contrib.slim
 
+NUM_CLASSES = 5
 FILE_PATTERN = 'avt_2020_v1_*.tfrecord'
 ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying height and width.',
@@ -136,5 +137,5 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
     return _get_split(split_name, dataset_dir,
                                       file_pattern, reader,
                                       SPLITS_TO_SIZES,
-                                      ITEMS_TO_DESCRIPTIONS, num_classes)
+                                      ITEMS_TO_DESCRIPTIONS, NUM_CLASSES)
 
