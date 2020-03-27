@@ -164,7 +164,7 @@ class SSDNet(object):
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_512_vgg'):
+            scope='ssd_avt_vgg'):
         """Network definition.
         """
         r = ssd_net(inputs,
@@ -419,12 +419,12 @@ def ssd_net(inputs,
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_512_vgg'):
+            scope='ssd_avt_vgg'):
     """SSD net definition.
     """
     # End_points collect relevant activations for external use.
     end_points = {}
-    with tf.variable_scope(scope, 'ssd_512_vgg', [inputs], reuse=reuse):
+    with tf.variable_scope(scope, 'ssd_avt_vgg', [inputs], reuse=reuse):
         # Original VGG-16 blocks.
         net = slim.repeat(inputs, 2, slim.conv2d, 64, [3, 3], scope='conv1')
         end_points['block1'] = net
