@@ -27,6 +27,7 @@ python train_ssd_doc_network.py \
 
 
 # Javascript code to connect colab even whe no clicks are performend
+
 var startClickConnect = function startClickConnect(){
     var clickConnect = function clickConnect(){
         console.log("Connnect Clicked - Start");
