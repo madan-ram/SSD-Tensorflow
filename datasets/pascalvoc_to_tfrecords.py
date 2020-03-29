@@ -109,13 +109,26 @@ def _process_image(directory, name):
     truncated = []
     for obj in root.findall('object'):
         label = obj.find('name').text
-        # Skill unlabelled object
+        # Skip unlabelled object
         if label == 'unlabelled' or label is None:
-            continue
+            attr_label = None
+            for attr in obj.find('attributes').findall('attribute'):
+                attr_label = attr.find('key').text
+                break
+            print(label, attr_label, obj.findall('attribute'))
+            if attr_label is not None and attr_label != 'unlabelled':
+                label = attr_label
+            else:
+                continue
+
         # HACK: Remove it for correct output
         # labels.append(label)
         # label = label+1
-        labels.append(int(VOC_LABELS[label][0]))
+        try:
+            labels.append(int(VOC_LABELS[label][0]))
+        except KeyError as ke:
+            print('SKilling label {} in file_id {}'.format(label, name))
+
         labels_text.append(str(label).encode('ascii'))
 
         if obj.find('difficult'):
