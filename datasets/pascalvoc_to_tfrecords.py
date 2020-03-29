@@ -115,7 +115,6 @@ def _process_image(directory, name):
             for attr in obj.find('attributes').findall('attribute'):
                 attr_label = attr.find('key').text
                 break
-            print(label, attr_label, obj.findall('attribute'))
             if attr_label is not None and attr_label != 'unlabelled':
                 label = attr_label
             else:
