@@ -39,6 +39,14 @@ from nets import custom_layers
 from nets import ssd_common
 from tensorflow.python.ops import array_ops
 
+def multiply_list_items(myList): 
+      
+    # Multiply elements one by one 
+    result = 1
+    for x in myList: 
+         result = result * x  
+    return result
+
 def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma=2):
     """Compute focal loss for predictions.
         Multi-labels Focal loss formula:
@@ -67,7 +75,41 @@ def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma
     neg_p_sub = array_ops.where(target_tensor > zeros, zeros, sigmoid_p)
     per_entry_cross_ent = - alpha * (pos_p_sub ** gamma) * tf.log(tf.clip_by_value(sigmoid_p, 1e-8, 1.0)) \
                           - (1 - alpha) * (neg_p_sub ** gamma) * tf.log(tf.clip_by_value(1.0 - sigmoid_p, 1e-8, 1.0))
-    return tf.reduce_sum(per_entry_cross_ent)
+    return tf.reduce_sum(per_entry_cross_ent, axis=-1)
+
+
+def focal_loss_v2(prediction_tensor, target_labels, alpha=0.25, gamma=2):
+    """Compute focal loss for predictions.
+        Multi-labels Focal loss formula:
+            FL = -alpha * (z-p)^gamma * log(p) -(1-alpha) * p^gamma * log(1-p)
+                 ,which alpha = 0.25, gamma = 2, p = sigmoid(x), z = target_tensor.
+    Args:
+     prediction_tensor: A float tensor of shape [batch_size, i_0, ..., i_{K-2},
+        num_classes] representing the predicted logits for each class
+     target_tensor: A float tensor of shape [batch_size, i_0, ..., i_{K-2},
+        1] representing one-hot encoded classification targets
+     weights: A float tensor of shape [batch_size, num_anchors]
+     alpha: A scalar tensor for focal loss alpha hyper-parameter
+     gamma: A scalar tensor for focal loss gamma hyper-parameter
+    Returns:
+        loss: A (scalar) tensor representing the value of the loss function
+    """
+    target_label_shape = target_labels.get_shape()
+    num_classes =  prediction_tensor.get_shape().as_list()[-1]
+    eye_m = tf.eye(num_classes, dtype=prediction_tensor.dtype)
+    target_tensor = tf.gather(eye_m, target_labels, batch_dims=0, name=None)
+    
+    t_shape = target_tensor.get_shape()
+    target_tensor = tf.reshape(target_tensor, (t_shape[0], multiply_list_items(t_shape[1:-1]), t_shape[-1]), name=None)
+
+    t_shape = prediction_tensor.get_shape()
+    prediction_tensor = tf.reshape(prediction_tensor, (t_shape[0], multiply_list_items(t_shape[1:-1]), t_shape[-1]), name=None)
+    
+    loss = focal_loss(prediction_tensor, target_tensor, alpha=alpha, gamma=gamma)
+
+    # Loss per label
+    loss = tf.reshape(loss, target_label_shape)
+    return loss
 
 slim = tf.contrib.slim
 # ssd_net.default_image_size = 1024
@@ -212,7 +254,7 @@ class SSDNet(object):
                     prediction_fn=prediction_fn,
                     reuse=reuse,
                     scope=scope)
-        # Update feature shapes (try at least!)
+        # Update feature shapes (try at least!) TODO: look into this somthing, somthing phishe
         if update_feat_shapes:
             shapes = ssd_feat_shapes_from_net(r[0], self.params.feat_shapes)
             self.params = self.params._replace(feat_shapes=shapes)
@@ -712,8 +754,11 @@ def ssd_losses(logits, localisations,
 
                 # Add cross-entropy loss.
                 with tf.name_scope('cross_entropy_pos'):
-                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits[i],
-                                                                          labels=gclasses[i])
+                    print('logits ->', logits[i].get_shape())
+                    print('gclasses ->', gclasses[i].get_shape())
+                    print("=================================================")
+                    loss = focal_loss_v2(logits[i], gclasses[i])
+                    print(loss.get_shape(), fpmask.get_shape())
                     loss = tf.losses.compute_weighted_loss(loss, fpmask)
                     l_cross_pos.append(loss)
 
