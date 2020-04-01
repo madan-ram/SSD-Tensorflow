@@ -10,14 +10,14 @@ python tf_convert_data.py \
 
 To train model
 
-DATASET_DIR=datasets/VOCdevkit/tf/train
+DATASET_DIR=/Users/madanram/SoulOfCoder/SSD-Tensorflow/datasets/VOC2012/tf
 TRAIN_DIR=./logs/
-python train_ssd_doc_network.py \
+python avt_train_ssd.py \
     --train_dir=${TRAIN_DIR} \
     --dataset_dir=${DATASET_DIR} \
     --dataset_name=pascalvoc_2012 \
     --dataset_split_name=train \
-    --model_name=ssd_vgg_doc \
+    --model_name=ssd_avt_vgg_deep \
     --save_summaries_secs=60 \
     --save_interval_secs=600 \
     --weight_decay=0.0005 \
@@ -26,7 +26,8 @@ python train_ssd_doc_network.py \
     --batch_size=32
 
 
-# Javascript code to connect colab even whe no clicks are performend
+// Javascript code to connect colab even whe no clicks are performend
+
 
 var startClickConnect = function startClickConnect(){
     var clickConnect = function clickConnect(){
