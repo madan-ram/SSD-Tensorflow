@@ -757,13 +757,14 @@ def ssd_losses(logits, localisations,
                     # print('logits ->', logits[i].get_shape())
                     # print('gclasses ->', gclasses[i].get_shape())
                     # print("=================================================")
-                    loss = focal_loss_v2(logits[i], gclasses[i])
-                    print(loss.get_shape(), fpmask.get_shape())
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits[i], gclasses[i])
+                    # loss = focal_loss_v2(logits[i], gclasses[i])
                     loss = tf.losses.compute_weighted_loss(loss, fpmask)
                     l_cross_pos.append(loss)
 
                 with tf.name_scope('cross_entropy_neg'):
-                    loss = focal_loss_v2(logits[i], no_classes)
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits[i], no_classes)
+                    # loss = focal_loss_v2(logits[i], no_classes)
                     loss = tf.losses.compute_weighted_loss(loss, fnmask)
                     l_cross_neg.append(loss)
 
