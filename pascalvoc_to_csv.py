@@ -25,24 +25,25 @@ image_dir = os.path.join(dataset_dir, 'JPEGImages')
 
 with open('data.csv', 'w') as fw:
     fw.write(','.join(['filename','width','height','class','xmin','ymin','xmax','ymax'])+'\n')
-    for annotation_fpath in annotation_fpath_lst:
+    for idx, annotation_fpath in enumerate(annotation_fpath_lst):
         file_id = annotation_fpath.split('/')[-1].split('.')[0]
         image_data, shape, bboxes, labels, labels_text, difficult, truncated = pascalvoc_to_tfrecords._process_image(dataset_dir, file_id, label_id_map=VOC_LABELS)
         img_path = os.path.join(image_dir, file_id+'.jpg')
         img_t = tf.constant(cv2.imread(img_path))
         labels_t = tf.constant(labels)
         bboxes_t = tf.constant(bboxes)
-        resized_t, labels_t, bboxes_t, bbox_img_t = preprocess_for_eval(img_t, labels, bboxes_t, out_shape=(input_height, input_width))
+        # resized_t, labels_t, bboxes_t, bbox_img_t = preprocess_for_eval(img_t, labels, bboxes_t, out_shape=(input_height, input_width))
         # resized_t, labels_t, bboxes_t = resize_image_bboxes_with_crop_or_pad(img_t, bboxes_t, input_height, input_width)
+        _, labels_t, bboxes_t, _ = preprocess_for_eval(img_t, labels, bboxes_t, out_shape=(input_height, input_width))
         
 
         with tf.Session() as sess:
             # sess.run(tf.global_variables_initializer())
-            resized_img, resized_bboxes, _ = sess.run([resized_t, bboxes_t, bbox_img_t])
+            resized_bboxes = sess.run(bboxes_t)
             # print(labels, resized_bboxes)
-            for (y, x, h, w), label, _, _ in zip(resized_bboxes, labels_text, difficult, truncated):
+            for (ymin, xmin, ymax, xmax), label, _, _ in zip(resized_bboxes, labels_text, difficult, truncated):
                 img_h, img_w = input_height, input_width
 
-                fw.write(','.join(map(str, [img_path, img_w, img_h, label, x, y, w+x, y+h]))+'\n')
+                fw.write(','.join(map(str, [img_path, img_w, img_h, label, xmin*img_w, ymin*img_h, xmax*img_w, ymax*img_h]))+'\n')
 
-
+        print('completed->', idx)
