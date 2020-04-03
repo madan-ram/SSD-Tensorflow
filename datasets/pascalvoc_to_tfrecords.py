@@ -76,7 +76,7 @@ def above_1_to_1(val):
         return 1.0
     return val
     
-def _process_image(directory, name):
+def _process_image(directory, name, label_id_map=VOC_LABELS):
     """Process a image and annotation file.
 
     Args:
@@ -124,7 +124,7 @@ def _process_image(directory, name):
         # labels.append(label)
         # label = label+1
         try:
-            labels.append(int(VOC_LABELS[label][0]))
+            labels.append(int(label_id_map[label][0]))
         except KeyError as ke:
             print('SKilling label {} in file_id {}'.format(label, name))
 
