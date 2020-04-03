@@ -5,7 +5,7 @@ from datasets import pascalvoc_to_tfrecords
 from notebooks.visualization import plt_bboxes
 import cv2
 import numpy as np
-from datasets.pascalvoc_common import VOC_LABELS
+from datasets.avt_2020_v1 import VOC_LABELS
 from preprocessing.ssd_vgg_preprocessing import preprocess_for_eval
 import tensorflow as tf
 from notebooks.visualization import plt_bboxes
