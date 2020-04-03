@@ -349,10 +349,9 @@ def preprocess_for_eval(image, labels, bboxes,
                 image, bboxes, out_shape[0], out_shape[1])
         elif resize == Resize.PAD_AND_RESIZE:
             # Resize image first: find the correct factor...
-            shape = tf.shape(image)
-            factor = tf.minimum(tf.to_double(1.0),
-                                tf.minimum(tf.to_double(out_shape[0] / shape[0]),
-                                           tf.to_double(out_shape[1] / shape[1])))
+            shape = tf.to_double(tf.shape(image))
+
+            factor = tf.minimum(tf.to_double(1.0), tf.minimum(tf.to_double(out_shape[0] / shape[0]), tf.to_double(out_shape[1] / shape[1])))
             resize_shape = factor * tf.to_double(shape[0:2])
             resize_shape = tf.cast(tf.floor(resize_shape), tf.int32)
 
