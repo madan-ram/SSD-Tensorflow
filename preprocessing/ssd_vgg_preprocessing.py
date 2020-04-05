@@ -261,36 +261,41 @@ def preprocess_for_train(image, labels, bboxes,
             image = tf.image.convert_image_dtype(image, dtype=tf.float32)
         tf_summary_image(image, bboxes, 'image_with_bboxes')
 
+
+        dst_image, labels, bboxes, distort_bbox = \
+            distorted_bounding_box_crop(image, labels, bboxes,
+                                        min_object_covered=MIN_OBJECT_COVERED,
+                                        aspect_ratio_range=CROP_RATIO_RANGE)
+
         if resize == Resize.NONE:
             # No resizing...
             pass
         elif resize == Resize.CENTRAL_CROP:
             # Central cropping of the image.
-            image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
-                image, bboxes, out_shape[0], out_shape[1])
+            dst_image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
+                dst_image, bboxes, out_shape[0], out_shape[1])
         elif resize == Resize.PAD_AND_RESIZE:
             # Resize image first: find the correct factor...
-            shape = tf.shape(image)
+            shape = tf.shape(dst_image)
             factor = tf.minimum(tf.to_double(1.0),
                                 tf.minimum(tf.to_double(out_shape[0] / shape[0]),
                                            tf.to_double(out_shape[1] / shape[1])))
             resize_shape = factor * tf.to_double(shape[0:2])
             resize_shape = tf.cast(tf.floor(resize_shape), tf.int32)
 
-            image = tf_image.resize_image(image, resize_shape,
+            dst_image = tf_image.resize_image(dst_image, resize_shape,
                                           method=tf.image.ResizeMethod.BILINEAR,
                                           align_corners=False)
             # Pad to expected size.
-            image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
-                image, bboxes, out_shape[0], out_shape[1])
+            dst_image, bboxes = tf_image.resize_image_bboxes_with_crop_or_pad(
+                dst_image, bboxes, out_shape[0], out_shape[1])
         elif resize == Resize.WARP_RESIZE:
             # Warp resize of the image.
-            image = tf_image.resize_image(image, out_shape,
+            dst_image = tf_image.resize_image(dst_image, out_shape,
                                           method=tf.image.ResizeMethod.BILINEAR,
                                           align_corners=False)
 
-        # Distort image and bounding boxes.
-        dst_image = image
+        
 
 
 
@@ -304,12 +309,13 @@ def preprocess_for_train(image, labels, bboxes,
         tf_summary_image(dst_image, bboxes, 'image_brightness_distorted')
 
         # Rescale to VGG input scale.
-        image = dst_image * 255.
-        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        dst_image = dst_image * 255.
+        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        
         # Image data format.
         if data_format == 'NCHW':
-            image = tf.transpose(image, perm=(2, 0, 1))
-        return image, labels, bboxes
+            image = tf.transpose(dst_image, perm=(2, 0, 1))
+        return dst_image, labels, bboxes
 
 
 def preprocess_for_eval(image, labels, bboxes,
@@ -331,7 +337,7 @@ def preprocess_for_eval(image, labels, bboxes,
             raise ValueError('Input must be of size [height, width, C>0]')
 
         image = tf.to_float(image)
-        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
 
         # Add image rectangle to bboxes.
         bbox_img = tf.constant([[0., 0., 1., 1.]])

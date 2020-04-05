@@ -195,7 +195,7 @@ class SSDNet(object):
     The default image size used to train this network is 512x512.
     """
     # Anchor box square sizes
-    anchor_size_bounds = [0.20, 0.90]
+    anchor_size_bounds = [0.50, 0.50]
     anchor_steps = [16, 32, 64, 128, 256, 512, 1024]
     avg_anchor_size_min = np.asarray(anchor_steps)*anchor_size_bounds[0]
     avg_anchor_size_max = np.asarray(anchor_steps)*anchor_size_bounds[1]
@@ -642,6 +642,7 @@ def ssd_net(inputs,
         predictions = []
         logits = []
         localisations = []
+        print(anchor_sizes)
         for i, layer in enumerate(feat_layers):
             print(layer,'shape is ->', end_points[layer].get_shape())
             with tf.variable_scope(layer + '_box'):
