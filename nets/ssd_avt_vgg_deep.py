@@ -194,28 +194,30 @@ class SSDNet(object):
       conv12 ==> 1 x 1
     The default image size used to train this network is 512x512.
     """
+    # Anchor box square sizes
+    anchor_size_bounds = [0.20, 0.90]
+    anchor_steps = [16, 32, 64, 128, 256, 512, 1024]
+    avg_anchor_size_min = np.asarray(anchor_steps)*anchor_size_bounds[0]
+    avg_anchor_size_max = np.asarray(anchor_steps)*anchor_size_bounds[1]
+    anchor_sizes = zip(avg_anchor_size_min,  avg_anchor_size_max)
+
     default_params = SSDParams(
         feat_layers=['block3', 'block4', 'block5', 'block6', 'block7', 'block8', 'block9'],
         img_shape=(1024, 1024),
         num_classes=4,
         no_annotation_label=4,
         feat_shapes=[(64, 64), (32, 32), (16, 16), (8, 8), (4, 4), (2, 2), (1, 1)],
-        anchor_size_bounds=[0.10, 0.90],
-        anchor_sizes=[(20.48, 51.2),
-                      (51.2, 133.12),
-                      (133.12, 215.04),
-                      (215.04, 296.96),
-                      (296.96, 378.88),
-                      (378.88, 460.8),
-                      (460.8, 542.72)],
-        anchor_ratios=[[2, .5],
-                       [2, .5, 3, 1./3],
-                       [2, .5, 3, 1./3],
-                       [2, .5, 3, 1./3],
-                       [2, .5, 3, 1./3],
-                       [2, .5],
-                       [2, .5]],
-        anchor_steps=[16, 32, 64, 128, 256, 512, 1024],
+        anchor_size_bounds=anchor_size_bounds,
+        anchor_sizes=anchor_sizes,
+        # Using Kmean clustering find best average aspect ration (centroid)
+        anchor_ratios=[[1.5, 1.7, 2.2],
+                       [1.5, 1.7, 2.2],
+                       [1.7, 2.2, 2.7, 3.6, 4.7],
+                       [1.6, 2.5, 3.3, 4, 5.0],
+                       [1.6, 3.9, 7.7],
+                       [1.5, 3.7, 7.0, 12.4],
+                       [4.2, 6.3, 9.6]],
+        anchor_steps=anchor_steps,
         anchor_offset=0.5,
         normalizations=[20, -1, -1, -1, -1, -1, -1],
         prior_scaling=[0.1, 0.1, 0.2, 0.2]
