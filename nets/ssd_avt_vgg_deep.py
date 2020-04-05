@@ -220,7 +220,7 @@ class SSDNet(object):
                        [4.2, 6.3, 9.6]],
         anchor_steps=anchor_steps,
         anchor_offset=0.5,
-        normalizations=[20, -1, -1, -1, -1, -1, -1],
+        normalizations=[-1, -1, -1, -1, -1, -1, -1],
         prior_scaling=[0.1, 0.1, 0.2, 0.2]
         )
 
@@ -515,8 +515,8 @@ def ssd_net(inputs,
         with tf.variable_scope(block):
           net = slim.conv2d(inputs, 32, [3, 3], stride=2, scope='conv3x3_1', padding='SAME')
           net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 64, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 64, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
+          net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -526,6 +526,9 @@ def ssd_net(inputs,
         block = 'block2'
         with tf.variable_scope(block):
           net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -534,7 +537,10 @@ def ssd_net(inputs,
         # Max 128 2 0 2
         block = 'block3'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -546,8 +552,8 @@ def ssd_net(inputs,
         # Max 256 2 0 2
         block = 'block4'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
@@ -561,8 +567,8 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block5'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
@@ -575,8 +581,10 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block6'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -586,8 +594,10 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block7'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -598,8 +608,10 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block8'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
@@ -609,8 +621,10 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block9'
         with tf.variable_scope(block):
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 384, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
+          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
