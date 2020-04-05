@@ -39,9 +39,9 @@ _G_MEAN = 117.
 _B_MEAN = 104.
 
 # Some training pre-processing parameters.
-BBOX_CROP_OVERLAP = 0.5         # Minimum overlap to keep a bbox after cropping.
-MIN_OBJECT_COVERED = 0.25
-CROP_RATIO_RANGE = (0.6, 1.67)  # Distortion ratio during cropping.
+BBOX_CROP_OVERLAP = 0.75         # Minimum overlap to keep a bbox after cropping.
+MIN_OBJECT_COVERED = 0.50
+CROP_RATIO_RANGE = (0.8, 1.2)  # Distortion ratio during cropping.
 EVAL_SIZE = (300, 300)
 
 
@@ -309,13 +309,13 @@ def preprocess_for_train(image, labels, bboxes,
         tf_summary_image(dst_image, bboxes, 'image_brightness_distorted')
 
         # Rescale to VGG input scale.
-        dst_image = dst_image * 255.
-        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
-        
+        image = dst_image * 255.
+        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+
         # Image data format.
         if data_format == 'NCHW':
-            image = tf.transpose(dst_image, perm=(2, 0, 1))
-        return dst_image, labels, bboxes
+            image = tf.transpose(image, perm=(2, 0, 1))
+        return image, labels, bboxes
 
 
 def preprocess_for_eval(image, labels, bboxes,
@@ -337,7 +337,7 @@ def preprocess_for_eval(image, labels, bboxes,
             raise ValueError('Input must be of size [height, width, C>0]')
 
         image = tf.to_float(image)
-        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
 
         # Add image rectangle to bboxes.
         bbox_img = tf.constant([[0., 0., 1., 1.]])
