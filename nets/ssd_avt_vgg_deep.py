@@ -199,7 +199,8 @@ class SSDNet(object):
     anchor_steps = [16, 32, 64, 128, 256, 512, 1024]
     avg_anchor_size_min = np.asarray(anchor_steps)*anchor_size_bounds[0]
     avg_anchor_size_max = np.asarray(anchor_steps)*anchor_size_bounds[1]
-    anchor_sizes = zip(avg_anchor_size_min,  avg_anchor_size_max)
+    print(avg_anchor_size_min, avg_anchor_size_max, '=========================')
+    anchor_sizes = [(smin, smax) for smin, smax in zip(avg_anchor_size_min, avg_anchor_size_max)]
 
     default_params = SSDParams(
         feat_layers=['block3', 'block4', 'block5', 'block6', 'block7', 'block8', 'block9'],
@@ -759,13 +760,13 @@ def ssd_losses(logits, localisations,
                     # print('logits ->', logits[i].get_shape())
                     # print('gclasses ->', gclasses[i].get_shape())
                     # print("=================================================")
-                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits[i], gclasses[i])
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits[i], labels=gclasses[i])
                     # loss = focal_loss_v2(logits[i], gclasses[i])
                     loss = tf.losses.compute_weighted_loss(loss, fpmask)
                     l_cross_pos.append(loss)
 
                 with tf.name_scope('cross_entropy_neg'):
-                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits[i], no_classes)
+                    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits[i], labels=no_classes)
                     # loss = focal_loss_v2(logits[i], no_classes)
                     loss = tf.losses.compute_weighted_loss(loss, fnmask)
                     l_cross_neg.append(loss)
