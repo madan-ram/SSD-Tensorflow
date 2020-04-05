@@ -200,7 +200,7 @@ class SSDNet(object):
     avg_anchor_size_min = np.asarray(anchor_steps)*anchor_size_bounds[0]
     avg_anchor_size_max = np.asarray(anchor_steps)*anchor_size_bounds[1]
     print(avg_anchor_size_min, avg_anchor_size_max, '=========================')
-    anchor_sizes = [(smin, smax) for smin, smax in zip(avg_anchor_size_min, avg_anchor_size_max)]
+    anchor_sizes = list(zip(avg_anchor_size_min, avg_anchor_size_max))
 
     default_params = SSDParams(
         feat_layers=['block3', 'block4', 'block5', 'block6', 'block7', 'block8', 'block9'],
