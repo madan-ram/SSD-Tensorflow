@@ -33,10 +33,6 @@ Resize = IntEnum('Resize', ('NONE',                # Nothing!
                             'PAD_AND_RESIZE',      # Pad, and resize to output shape.
                             'WARP_RESIZE'))        # Warp resize.
 
-# VGG mean parameters.
-_R_MEAN = 123.
-_G_MEAN = 117.
-_B_MEAN = 104.
 
 # Some training pre-processing parameters.
 BBOX_CROP_OVERLAP = 0.60         # Minimum overlap to keep a bbox after cropping.
@@ -44,6 +40,10 @@ MIN_OBJECT_COVERED = 0.50
 CROP_RATIO_RANGE = (0.8, 1.2)  # Distortion ratio during cropping.
 EVAL_SIZE = (300, 300)
 
+# VGG mean parameters.
+_R_MEAN = 123.
+_G_MEAN = 117.
+_B_MEAN = 104.
 
 def tf_image_whitened(image, means=[_R_MEAN, _G_MEAN, _B_MEAN]):
     """Subtracts the given means from each image channel.
@@ -310,7 +310,7 @@ def preprocess_for_train(image, labels, bboxes,
 
         # Rescale to VGG input scale.
         image = dst_image * 255.
-        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
 
         # Image data format.
         if data_format == 'NCHW':
@@ -337,7 +337,7 @@ def preprocess_for_eval(image, labels, bboxes,
             raise ValueError('Input must be of size [height, width, C>0]')
 
         image = tf.to_float(image)
-        image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
+        # image = tf_image_whitened(image, [_R_MEAN, _G_MEAN, _B_MEAN])
 
         # Add image rectangle to bboxes.
         bbox_img = tf.constant([[0., 0., 1., 1.]])
