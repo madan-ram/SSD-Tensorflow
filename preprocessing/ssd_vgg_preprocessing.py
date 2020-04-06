@@ -37,8 +37,8 @@ Resize = IntEnum('Resize', ('NONE',                # Nothing!
 # Some training pre-processing parameters.
 BBOX_CROP_OVERLAP = 0.60         # Minimum overlap to keep a bbox after cropping.
 MIN_OBJECT_COVERED = 0.50
-CROP_RATIO_RANGE = (0.8, 1.2)  # Distortion ratio during cropping.
-EVAL_SIZE = (300, 300)
+CROP_RATIO_RANGE = (0.39, 0.6)  # Distortion ratio during cropping.
+EVAL_SIZE = (1024, 1024)
 
 # VGG mean parameters.
 _R_MEAN = 123.
@@ -294,9 +294,6 @@ def preprocess_for_train(image, labels, bboxes,
             dst_image = tf_image.resize_image(dst_image, out_shape,
                                           method=tf.image.ResizeMethod.BILINEAR,
                                           align_corners=False)
-
-        
-
 
 
         # dst_image = tf.image.resize_with_pad(dst_image, out_shape[0], out_shape[1],
