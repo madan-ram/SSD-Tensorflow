@@ -203,7 +203,7 @@ class SSDNet(object):
     anchor_sizes = list(zip(avg_anchor_size_min, avg_anchor_size_max))
 
     default_params = SSDParams(
-        feat_layers=['block3', 'block4', 'block5', 'block6', 'block7', 'block8', 'block9'],
+        feat_layers=['block3_fused_block4', 'block4_fused_block5', 'block5_fused_block6', 'block6', 'block7', 'block8', 'block9'],
         img_shape=(1024, 1024),
         num_classes=5,
         no_annotation_label=5,
@@ -465,6 +465,21 @@ def ssd_anchor_one_layer(img_shape,
     return y, x, h, w
 
 
+def fuse_conv_layer(fuse_to, fuse_from, num_filters, filter_size=2, strides=2):
+  # Upsample and normalize
+  fuse_from_num_of_filters = fuse_from.get_shape()[-1]
+  weights = slim.variable('fuse_conv_weights', initializer=tf.random_normal_initializer(stddev=0.02),
+                             shape=[filter_size, filter_size, fuse_from_num_of_filters, fuse_from_num_of_filters])
+
+  fuse_from = tf.nn.relu(tf.nn.conv2d_transpose(fuse_from, weights, fuse_to.get_shape(), padding='SAME', strides=strides))
+  fuse_from_norm = custom_layers.l2_normalization(fuse_from, scaling=True)
+
+  fuse_to_norm = custom_layers.l2_normalization(fuse_to, scaling=True)
+  fused_layer = tf.concat([fuse_to_norm, fuse_from_norm], axis=3)
+  fused_layer = net = slim.conv2d(fused_layer, num_filters, [1, 1], stride=1, scope='fusion_weight_layer', padding='SAME')
+  
+  return fused_layer
+
 def ssd_anchors_all_layers(img_shape,
                            layers_shape,
                            anchor_sizes,
@@ -559,6 +574,11 @@ def ssd_net(inputs,
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
+        block = 'block3_fused_block4'
+        with tf.variable_scope(block):
+          fuse_net = fuse_conv_layer(end_points['block3'], end_points['block4'], 256)
+          end_points[block] = fuse_net
+
         # Block5
         # Conv  384 1 0 3
         # Conv  384 1 0 3
@@ -571,9 +591,15 @@ def ssd_net(inputs,
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
+
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
 
+
+        block = 'block4_fused_block5'
+        with tf.variable_scope(block):
+          fuse_net = fuse_conv_layer(end_points['block4'], end_points['block5'], 256)
+          end_points[block] = fuse_net
 
         # Block6
         # Conv  384 1 0 3
@@ -587,6 +613,11 @@ def ssd_net(inputs,
           net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
           net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
           end_points[block] = net
+
+        block = 'block5_fused_block6'
+        with tf.variable_scope(block):
+          fuse_net = fuse_conv_layer(end_points['block5'], end_points['block6'], 256)
+          end_points[block] = fuse_net
 
         # Block7
         # Conv  384 1 0 3
