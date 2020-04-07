@@ -10,7 +10,7 @@ python tf_convert_data.py \
 
 To train model
 
-DATASET_DIR=/Users/madanram/SoulOfCoder/SSD-Tensorflow/datasets/VOC2012/tf
+DATASET_DIR=/Users/madanram/SoulOfCoder/SSD-Tensorflow/datasets/VOC2012/tf/
 TRAIN_DIR=./logs/
 python avt_train_ssd.py \
     --train_dir=${TRAIN_DIR} \

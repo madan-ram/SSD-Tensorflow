@@ -37,7 +37,7 @@ with open('data.csv', 'w') as fw:
         _, labels_t, bboxes_t, _ = preprocess_for_eval(img_t, labels, bboxes_t, out_shape=(input_height, input_width))
         
 
-        with tf.Session() as sess:
+        with tf.compat.v1.Session() as sess:
             # sess.run(tf.global_variables_initializer())
             resized_bboxes = sess.run(bboxes_t)
             # print(labels, resized_bboxes)

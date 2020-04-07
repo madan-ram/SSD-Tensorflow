@@ -51,5 +51,5 @@ def main(_):
     pascalvoc_to_tfrecords.run(FLAGS.dataset_dir, FLAGS.output_dir, FLAGS.dataset_name, FLAGS.output_name)
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()
 
