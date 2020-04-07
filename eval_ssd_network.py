@@ -109,7 +109,7 @@ def main(_):
     if not FLAGS.dataset_dir:
         raise ValueError('You must supply the dataset directory with --dataset_dir')
 
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
     with tf.Graph().as_default():
         tf_global_step = slim.get_or_create_global_step()
 
@@ -139,7 +139,7 @@ def main(_):
         # Create a dataset provider and batches.
         # =================================================================== #
         with tf.device('/cpu:0'):
-            with tf.name_scope(FLAGS.dataset_name + '_data_provider'):
+            with tf.compat.v1.name_scope(FLAGS.dataset_name + '_data_provider'):
                 provider = slim.dataset_data_provider.DatasetDataProvider(
                     dataset,
                     common_queue_capacity=2 * FLAGS.batch_size,
@@ -152,7 +152,7 @@ def main(_):
             if FLAGS.remove_difficult:
                 [gdifficults] = provider.get(['object/difficult'])
             else:
-                gdifficults = tf.zeros(tf.shape(glabels), dtype=tf.int64)
+                gdifficults = tf.zeros(tf.shape(input=glabels), dtype=tf.int64)
 
             # Pre-processing image, labels and bboxes.
             image, glabels, gbboxes, gbbox_img = \
@@ -168,7 +168,7 @@ def main(_):
             batch_shape = [1] * 5 + [len(ssd_anchors)] * 3
 
             # Evaluation batch.
-            r = tf.train.batch(
+            r = tf.compat.v1.train.batch(
                 tf_utils.reshape_list([image, glabels, gbboxes, gdifficults, gbbox_img,
                                        gclasses, glocalisations, gscores]),
                 batch_size=FLAGS.batch_size,
@@ -223,19 +223,19 @@ def main(_):
         with tf.device('/device:CPU:0'):
             dict_metrics = {}
             # First add all losses.
-            for loss in tf.get_collection(tf.GraphKeys.LOSSES):
+            for loss in tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.LOSSES):
                 dict_metrics[loss.op.name] = slim.metrics.streaming_mean(loss)
             # Extra losses as well.
-            for loss in tf.get_collection('EXTRA_LOSSES'):
+            for loss in tf.compat.v1.get_collection('EXTRA_LOSSES'):
                 dict_metrics[loss.op.name] = slim.metrics.streaming_mean(loss)
 
             # Add metrics to summaries and Print on screen.
             for name, metric in dict_metrics.items():
                 # summary_name = 'eval/%s' % name
                 summary_name = name
-                op = tf.summary.scalar(summary_name, metric[0], collections=[])
+                op = tf.compat.v1.summary.scalar(summary_name, metric[0], collections=[])
                 # op = tf.Print(op, [metric[0]], summary_name)
-                tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+                tf.compat.v1.add_to_collection(tf.compat.v1.GraphKeys.SUMMARIES, op)
 
             # FP and TP metrics.
             tp_fp_metric = tfe.streaming_tp_fp_arrays(num_gbboxes, tp, fp, rscores)
@@ -253,32 +253,32 @@ def main(_):
                 # Average precision VOC07.
                 v = tfe.average_precision_voc07(prec, rec)
                 summary_name = 'AP_VOC07/%s' % c
-                op = tf.summary.scalar(summary_name, v, collections=[])
+                op = tf.compat.v1.summary.scalar(summary_name, v, collections=[])
                 # op = tf.Print(op, [v], summary_name)
-                tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+                tf.compat.v1.add_to_collection(tf.compat.v1.GraphKeys.SUMMARIES, op)
                 aps_voc07[c] = v
 
                 # Average precision VOC12.
                 v = tfe.average_precision_voc12(prec, rec)
                 summary_name = 'AP_VOC12/%s' % c
-                op = tf.summary.scalar(summary_name, v, collections=[])
+                op = tf.compat.v1.summary.scalar(summary_name, v, collections=[])
                 # op = tf.Print(op, [v], summary_name)
-                tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+                tf.compat.v1.add_to_collection(tf.compat.v1.GraphKeys.SUMMARIES, op)
                 aps_voc12[c] = v
 
             # Mean average precision VOC07.
             summary_name = 'AP_VOC07/mAP'
             mAP = tf.add_n(list(aps_voc07.values())) / len(aps_voc07)
-            op = tf.summary.scalar(summary_name, mAP, collections=[])
-            op = tf.Print(op, [mAP], summary_name)
-            tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+            op = tf.compat.v1.summary.scalar(summary_name, mAP, collections=[])
+            op = tf.compat.v1.Print(op, [mAP], summary_name)
+            tf.compat.v1.add_to_collection(tf.compat.v1.GraphKeys.SUMMARIES, op)
 
             # Mean average precision VOC12.
             summary_name = 'AP_VOC12/mAP'
             mAP = tf.add_n(list(aps_voc12.values())) / len(aps_voc12)
-            op = tf.summary.scalar(summary_name, mAP, collections=[])
-            op = tf.Print(op, [mAP], summary_name)
-            tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+            op = tf.compat.v1.summary.scalar(summary_name, mAP, collections=[])
+            op = tf.compat.v1.Print(op, [mAP], summary_name)
+            tf.compat.v1.add_to_collection(tf.compat.v1.GraphKeys.SUMMARIES, op)
 
         # for i, v in enumerate(l_precisions):
         #     summary_name = 'eval/precision_at_recall_%.2f' % LIST_RECALLS[i]
@@ -292,8 +292,8 @@ def main(_):
         # =================================================================== #
         # Evaluation loop.
         # =================================================================== #
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=FLAGS.gpu_memory_fraction)
-        config = tf.ConfigProto(log_device_placement=False, gpu_options=gpu_options)
+        gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=FLAGS.gpu_memory_fraction)
+        config = tf.compat.v1.ConfigProto(log_device_placement=False, gpu_options=gpu_options)
         # config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 
         # Number of batches...
@@ -303,11 +303,11 @@ def main(_):
             num_batches = math.ceil(dataset.num_samples / float(FLAGS.batch_size))
 
         if not FLAGS.wait_for_checkpoints:
-            if tf.gfile.IsDirectory(FLAGS.checkpoint_path):
+            if tf.io.gfile.isdir(FLAGS.checkpoint_path):
                 checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
             else:
                 checkpoint_path = FLAGS.checkpoint_path
-            tf.logging.info('Evaluating %s' % checkpoint_path)
+            tf.compat.v1.logging.info('Evaluating %s' % checkpoint_path)
 
             # Standard evaluation loop.
             start = time.time()
@@ -327,7 +327,7 @@ def main(_):
 
         else:
             checkpoint_path = FLAGS.checkpoint_path
-            tf.logging.info('Evaluating %s' % checkpoint_path)
+            tf.compat.v1.logging.info('Evaluating %s' % checkpoint_path)
 
             # Waiting loop.
             slim.evaluation.evaluation_loop(
@@ -344,4 +344,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()

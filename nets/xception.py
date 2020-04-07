@@ -29,17 +29,17 @@ def xception(inputs,
     # summaries or losses.
     end_points = {}
 
-    with tf.variable_scope(scope, 'xception', [inputs]):
+    with tf.compat.v1.variable_scope(scope, 'xception', [inputs]):
         # Block 1.
         end_point = 'block1'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             net = slim.conv2d(inputs, 32, [3, 3], stride=2, padding='VALID', scope='conv1')
             net = slim.conv2d(net, 64, [3, 3], padding='VALID', scope='conv2')
         end_points[end_point] = net
 
         # Residual block 2.
         end_point = 'block2'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             res = slim.conv2d(net, 128, [1, 1], stride=2, activation_fn=None, scope='res')
             net = slim.separable_convolution2d(net, 128, [3, 3], 1, scope='sepconv1')
             net = slim.separable_convolution2d(net, 128, [3, 3], 1, activation_fn=None, scope='sepconv2')
@@ -49,7 +49,7 @@ def xception(inputs,
 
         # Residual block 3.
         end_point = 'block3'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             res = slim.conv2d(net, 256, [1, 1], stride=2, activation_fn=None, scope='res')
             net = tf.nn.relu(net)
             net = slim.separable_convolution2d(net, 256, [3, 3], 1, scope='sepconv1')
@@ -60,7 +60,7 @@ def xception(inputs,
 
         # Residual block 4.
         end_point = 'block4'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             res = slim.conv2d(net, 728, [1, 1], stride=2, activation_fn=None, scope='res')
             net = tf.nn.relu(net)
             net = slim.separable_convolution2d(net, 728, [3, 3], 1, scope='sepconv1')
@@ -72,7 +72,7 @@ def xception(inputs,
         # Middle flow blocks.
         for i in range(8):
             end_point = 'block' + str(i + 5)
-            with tf.variable_scope(end_point):
+            with tf.compat.v1.variable_scope(end_point):
                 res = net
                 net = tf.nn.relu(net)
                 net = slim.separable_convolution2d(net, 728, [3, 3], 1, activation_fn=None,
@@ -88,7 +88,7 @@ def xception(inputs,
 
         # Exit flow: blocks 13 and 14.
         end_point = 'block13'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             res = slim.conv2d(net, 1024, [1, 1], stride=2, activation_fn=None, scope='res')
             net = tf.nn.relu(net)
             net = slim.separable_convolution2d(net, 728, [3, 3], 1, activation_fn=None, scope='sepconv1')
@@ -99,15 +99,15 @@ def xception(inputs,
         end_points[end_point] = net
 
         end_point = 'block14'
-        with tf.variable_scope(end_point):
+        with tf.compat.v1.variable_scope(end_point):
             net = slim.separable_convolution2d(net, 1536, [3, 3], 1, scope='sepconv1')
             net = slim.separable_convolution2d(net, 2048, [3, 3], 1, scope='sepconv2')
         end_points[end_point] = net
 
         # Global averaging.
         end_point = 'dense'
-        with tf.variable_scope(end_point):
-            net = tf.reduce_mean(net, [1, 2], name='reduce_avg')
+        with tf.compat.v1.variable_scope(end_point):
+            net = tf.reduce_mean(input_tensor=net, axis=[1, 2], name='reduce_avg')
             logits = slim.fully_connected(net, 1000, activation_fn=None)
 
             end_points['logits'] = logits
@@ -133,16 +133,16 @@ def xception_arg_scope(weight_decay=0.00001, stddev=0.1):
       # epsilon to prevent 0s in variance.
       'epsilon': 0.001,
       # collection containing update_ops.
-      'updates_collections': tf.GraphKeys.UPDATE_OPS,
+      'updates_collections': tf.compat.v1.GraphKeys.UPDATE_OPS,
     }
 
     # Set weight_decay for weights in Conv and FC layers.
     with slim.arg_scope([slim.conv2d, slim.fully_connected, slim.separable_convolution2d],
-                        weights_regularizer=slim.l2_regularizer(weight_decay)):
+                        weights_regularizer=tf.keras.regularizers.l2(0.5 * (weight_decay))):
         with slim.arg_scope(
                 [slim.conv2d, slim.separable_convolution2d],
                 padding='SAME',
-                weights_initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0, mode='FAN_IN', uniform=False),
+                weights_initializer=tf.compat.v1.keras.initializers.VarianceScaling(scale=2.0, mode=('FAN_IN').lower(), distribution=("uniform" if False else "truncated_normal")),
                 activation_fn=tf.nn.relu,
                 normalizer_fn=slim.batch_norm,
                 normalizer_params=batch_norm_params):
@@ -172,7 +172,7 @@ def xception_keras_arg_scope(hdf5_file, weight_decay=0.00001):
         'scale': False,
         'decay': 0.9997,
         'epsilon': 0.001,
-        'updates_collections': tf.GraphKeys.UPDATE_OPS,
+        'updates_collections': tf.compat.v1.GraphKeys.UPDATE_OPS,
     }
 
     # Read weights from HDF5 file.
@@ -262,7 +262,7 @@ def xception_keras_arg_scope(hdf5_file, weight_decay=0.00001):
 
     # Default network arg scope.
     with slim.arg_scope([slim.conv2d, slim.fully_connected, slim.separable_convolution2d],
-                        weights_regularizer=slim.l2_regularizer(weight_decay)):
+                        weights_regularizer=tf.keras.regularizers.l2(0.5 * (weight_decay))):
         with slim.arg_scope(
                 [slim.conv2d, slim.separable_convolution2d],
                 padding='SAME',

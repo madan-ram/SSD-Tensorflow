@@ -185,7 +185,7 @@ def main(_):
     if not FLAGS.dataset_dir:
         raise ValueError('You must supply the dataset directory with --dataset_dir')
 
-    tf.logging.set_verbosity(tf.logging.DEBUG)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.DEBUG)
     with tf.Graph().as_default():
         # Config model_deploy. Keep TF Slim Models structure.
         # Useful if want to need multiple GPUs and/or servers in the future.
@@ -221,7 +221,7 @@ def main(_):
         # Create a dataset provider and batches.
         # =================================================================== #
         with tf.device(deploy_config.inputs_device()):
-            with tf.name_scope(FLAGS.dataset_name + '_data_provider'):
+            with tf.compat.v1.name_scope(FLAGS.dataset_name + '_data_provider'):
                 provider = slim.dataset_data_provider.DatasetDataProvider(
                     dataset,
                     num_readers=FLAGS.num_readers,
@@ -243,7 +243,7 @@ def main(_):
             batch_shape = [1] + [len(ssd_anchors)] * 3
 
             # Training batches and queue.
-            r = tf.train.batch(
+            r = tf.compat.v1.train.batch(
                 tf_utils.reshape_list([image, gclasses, glocalisations, gscores]),
                 batch_size=FLAGS.batch_size,
                 num_threads=FLAGS.num_preprocessing_threads,
@@ -283,7 +283,7 @@ def main(_):
             return end_points
 
         # Gather initial summaries.
-        summaries = set(tf.get_collection(tf.GraphKeys.SUMMARIES))
+        summaries = set(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.SUMMARIES))
 
         # =================================================================== #
         # Add summaries from first clone.
@@ -292,24 +292,24 @@ def main(_):
         first_clone_scope = deploy_config.clone_scope(0)
         # Gather update_ops from the first clone. These contain, for example,
         # the updates for the batch_norm variables created by network_fn.
-        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS, first_clone_scope)
+        update_ops = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS, first_clone_scope)
 
         # Add summaries for end_points.
         end_points = clones[0].outputs
         for end_point in end_points:
             x = end_points[end_point]
-            summaries.add(tf.summary.histogram('activations/' + end_point, x))
-            summaries.add(tf.summary.scalar('sparsity/' + end_point,
+            summaries.add(tf.compat.v1.summary.histogram('activations/' + end_point, x))
+            summaries.add(tf.compat.v1.summary.scalar('sparsity/' + end_point,
                                             tf.nn.zero_fraction(x)))
         # Add summaries for losses and extra losses.
-        for loss in tf.get_collection(tf.GraphKeys.LOSSES, first_clone_scope):
-            summaries.add(tf.summary.scalar(loss.op.name, loss))
-        for loss in tf.get_collection('EXTRA_LOSSES', first_clone_scope):
-            summaries.add(tf.summary.scalar(loss.op.name, loss))
+        for loss in tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.LOSSES, first_clone_scope):
+            summaries.add(tf.compat.v1.summary.scalar(loss.op.name, loss))
+        for loss in tf.compat.v1.get_collection('EXTRA_LOSSES', first_clone_scope):
+            summaries.add(tf.compat.v1.summary.scalar(loss.op.name, loss))
 
         # Add summaries for variables.
         for variable in slim.get_model_variables():
-            summaries.add(tf.summary.histogram(variable.op.name, variable))
+            summaries.add(tf.compat.v1.summary.histogram(variable.op.name, variable))
 
         # =================================================================== #
         # Configure the moving averages.
@@ -329,7 +329,7 @@ def main(_):
                                                              dataset.num_samples,
                                                              global_step)
             optimizer = tf_utils.configure_optimizer(FLAGS, learning_rate)
-            summaries.add(tf.summary.scalar('learning_rate', learning_rate))
+            summaries.add(tf.compat.v1.summary.scalar('learning_rate', learning_rate))
 
         if FLAGS.moving_average_decay:
             # Update ops executed locally by trainer.
@@ -344,7 +344,7 @@ def main(_):
             optimizer,
             var_list=variables_to_train)
         # Add total_loss to summary.
-        summaries.add(tf.summary.scalar('total_loss', total_loss))
+        summaries.add(tf.compat.v1.summary.scalar('total_loss', total_loss))
 
         # Create gradient updates.
         grad_updates = optimizer.apply_gradients(clones_gradients,
@@ -355,18 +355,18 @@ def main(_):
                                                           name='train_op')
 
         # Add the summaries from the first clone. These contain the summaries
-        summaries |= set(tf.get_collection(tf.GraphKeys.SUMMARIES,
+        summaries |= set(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.SUMMARIES,
                                            first_clone_scope))
         # Merge all summaries together.
-        summary_op = tf.summary.merge(list(summaries), name='summary_op')
+        summary_op = tf.compat.v1.summary.merge(list(summaries), name='summary_op')
 
         # =================================================================== #
         # Kicks off the training.
         # =================================================================== #
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=FLAGS.gpu_memory_fraction)
-        config = tf.ConfigProto(log_device_placement=False,
+        gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=FLAGS.gpu_memory_fraction)
+        config = tf.compat.v1.ConfigProto(log_device_placement=False,
                                 gpu_options=gpu_options)
-        saver = tf.train.Saver(max_to_keep=5,
+        saver = tf.compat.v1.train.Saver(max_to_keep=5,
                                keep_checkpoint_every_n_hours=1.0,
                                write_version=2,
                                pad_step_number=False)
@@ -387,4 +387,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()

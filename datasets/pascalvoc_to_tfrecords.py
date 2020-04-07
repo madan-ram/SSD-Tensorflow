@@ -89,7 +89,7 @@ def _process_image(directory, name, label_id_map=VOC_LABELS):
     """
     # Read the image file.
     filename = directory + DIRECTORY_IMAGES + name + '.jpg'
-    image_data = tf.gfile.FastGFile(filename, 'rb').read()
+    image_data = tf.compat.v1.gfile.FastGFile(filename, 'rb').read()
 
     # Read the XML annotation file.
     filename = os.path.join(directory, DIRECTORY_ANNOTATIONS, name + '.xml')
@@ -219,8 +219,8 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
       dataset_dir: The dataset directory where the dataset is stored.
       output_dir: Output directory.
     """
-    if not tf.gfile.Exists(dataset_dir):
-        tf.gfile.MakeDirs(dataset_dir)
+    if not tf.io.gfile.exists(dataset_dir):
+        tf.io.gfile.makedirs(dataset_dir)
 
     # Dataset filenames, and shuffling.
     path = os.path.join(dataset_dir, DIRECTORY_ANNOTATIONS)
@@ -236,7 +236,7 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
     while i < len(filenames):
         # Open new TFRecord file.
         tf_filename = _get_output_filename(output_dir, name, fidx)
-        with tf.python_io.TFRecordWriter(tf_filename) as tfrecord_writer:
+        with tf.io.TFRecordWriter(tf_filename) as tfrecord_writer:
             j = 0
             while i < len(filenames) and j < SAMPLES_PER_FILES:
                 sys.stdout.write('\r>> Converting image %d/%d' % (i+1, len(filenames)))

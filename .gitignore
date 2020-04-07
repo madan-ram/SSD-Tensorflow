@@ -18,10 +18,12 @@ checkpoints/model.ckpt-*
 logs/
 *.log
 nohup.out
+data.csv
 
 ssd-tensorflow.sublime-workspace
 ssd-tensorflow.sublime-project
 
+datasets/VOC2012/
 datasets/VOCdevkit/
 checkpoints/ssd_300_vgg.ckpt/
 
