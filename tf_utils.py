@@ -169,6 +169,9 @@ def configure_optimizer(flags, learning_rate):
         optimizer = tf.train.GradientDescentOptimizer(learning_rate)
     else:
         raise ValueError('Optimizer [%s] was not recognized', flags.optimizer)
+
+    if FLAGS.use_tpu:
+        optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
     return optimizer
 
 
