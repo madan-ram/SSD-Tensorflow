@@ -180,7 +180,8 @@ SSDParams = namedtuple('SSDParameters', ['img_shape',
                                          'anchor_steps',
                                          'anchor_offset',
                                          'normalizations',
-                                         'prior_scaling'
+                                         'prior_scaling',
+                                         'input_keras'
                                          ])
 
 
@@ -224,7 +225,8 @@ class SSDNet(object):
         anchor_steps=anchor_steps,
         anchor_offset=0.5,
         normalizations=[-1, -1, -1, -1, -1, -1, -1],
-        prior_scaling=[0.1, 0.1, 0.2, 0.2]
+        prior_scaling=[0.1, 0.1, 0.2, 0.2],
+        input_keras=None
         )
 
     def __init__(self, params=None):
