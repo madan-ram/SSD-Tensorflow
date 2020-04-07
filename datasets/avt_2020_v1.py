@@ -21,7 +21,7 @@ from datasets import dataset_utils
 
 slim = tf.contrib.slim
 
-NUM_CLASSES = 4
+NUM_CLASSES = 5
 FILE_PATTERN = 'avt_2020_v1_*.tfrecord'
 ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying height and width.',
@@ -31,7 +31,8 @@ ITEMS_TO_DESCRIPTIONS = {
 }
 
 VOC_LABELS = {
-    'InvoiceDate': (0, 'date'),
+    'none': (0, 'Background'),
+    'InvoiceDate': (4, 'date'),
     'InvoiceTable': (1, 'table'),
     'InvoiceDescription': (2, 'string'),
     'InvoiceAmount': (3, 'number')
