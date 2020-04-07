@@ -246,7 +246,7 @@ class SSDNet(object):
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_avt_vgg'):
+            scope='ssd_avt_vgg_deep'):
         """Network definition.
         """
         r = ssd_net(inputs,
@@ -473,13 +473,10 @@ def fuse_conv_layer(fuse_to, fuse_from, num_filters, filter_size=2, strides=2):
   fuse_from_num_of_filters = fuse_from.get_shape()[-1]
   kernel_size = (filter_size, filter_size)
 
-  print('=================================================', fuse_from.get_shape())
   fuse_from = tf.keras.layers.Conv2DTranspose(fuse_from_num_of_filters, kernel_size, activation='relu', padding='SAME', strides=strides)(fuse_from)
   fuse_from_norm = custom_layers.l2_normalization(fuse_from, scaling=True)
 
-  print('=================================================', fuse_from_norm.get_shape())
   fuse_to_norm = custom_layers.l2_normalization(fuse_to, scaling=True)
-  print('=================================================', fuse_to_norm.get_shape())
 
   fused_layer = tf.concat([fuse_to_norm, fuse_from_norm], axis=3)
   
@@ -521,13 +518,13 @@ def ssd_net(inputs,
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_avt_vgg'):
+            scope='ssd_avt_vgg_deep'):
     """SSD net definition.
     """
 
     # End_points collect relevant activations for external use.
     end_points = {}
-    with tf.compat.v1.variable_scope(scope, 'ssd_avt_vgg', [inputs], reuse=reuse):
+    with tf.compat.v1.variable_scope(scope, 'ssd_avt_vgg_deep', [inputs], reuse=reuse):
         # Block1
         # Conv  32  2 0 3
         # Conv  32  1 0 3
