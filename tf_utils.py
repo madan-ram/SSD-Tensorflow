@@ -170,7 +170,7 @@ def configure_optimizer(flags, learning_rate):
     else:
         raise ValueError('Optimizer [%s] was not recognized', flags.optimizer)
 
-    if flags.use_tpu:
+    if flags.use_tpu == 1:
         optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
     return optimizer
 
