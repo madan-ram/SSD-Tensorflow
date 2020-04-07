@@ -39,6 +39,9 @@ from nets import custom_layers
 from nets import ssd_common
 from tensorflow.python.ops import array_ops
 
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Lambda, Activation, Conv2D, MaxPooling2D, ZeroPadding2D, Reshape, Concatenate
+
 def multiply_list_items(myList): 
       
     # Multiply elements one by one 
@@ -468,15 +471,20 @@ def ssd_anchor_one_layer(img_shape,
 def fuse_conv_layer(fuse_to, fuse_from, num_filters, filter_size=2, strides=2):
   # Upsample and normalize
   fuse_from_num_of_filters = fuse_from.get_shape()[-1]
-  weights = slim.variable('fuse_conv_weights', initializer=tf.compat.v1.random_normal_initializer(stddev=0.02),
-                             shape=[filter_size, filter_size, fuse_from_num_of_filters, fuse_from_num_of_filters])
+  kernel_size = (filter_size, filter_size)
 
-  fuse_from = tf.nn.relu(tf.nn.conv2d_transpose(fuse_from, weights, fuse_to.get_shape(), padding='SAME', strides=strides))
+  print('=================================================', fuse_from.get_shape())
+  fuse_from = tf.keras.layers.Conv2DTranspose(fuse_from_num_of_filters, kernel_size, activation='relu', padding='SAME', strides=strides)(fuse_from)
   fuse_from_norm = custom_layers.l2_normalization(fuse_from, scaling=True)
 
+  print('=================================================', fuse_from_norm.get_shape())
   fuse_to_norm = custom_layers.l2_normalization(fuse_to, scaling=True)
+  print('=================================================', fuse_to_norm.get_shape())
+
   fused_layer = tf.concat([fuse_to_norm, fuse_from_norm], axis=3)
-  fused_layer = net = slim.conv2d(fused_layer, num_filters, [1, 1], stride=1, scope='fusion_weight_layer', padding='SAME')
+  
+  fused_layer = Conv2D(num_filters, (1, 1), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='fusion_weight_layer')(fused_layer)
+  # fused_layer = net = slim.conv2d(fused_layer, num_filters, [1, 1], stride=1, scope='fusion_weight_layer', padding='SAME')
   
   return fused_layer
 
@@ -528,11 +536,11 @@ def ssd_net(inputs,
         # Max 64  2 0 2
         block = 'block1'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(inputs, 32, [3, 3], stride=2, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 32, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(32, (3, 3), activation='relu', strides=2, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(inputs)
+          net = Conv2D(32, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(32, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(32, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         # Block2
@@ -540,11 +548,11 @@ def ssd_net(inputs,
         # Max 128 2 0 3
         block = 'block2'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 128, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(128, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(128, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(128, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(128, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         # Block3
@@ -552,11 +560,11 @@ def ssd_net(inputs,
         # Max 128 2 0 2
         block = 'block3'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         # Block4
@@ -567,11 +575,11 @@ def ssd_net(inputs,
         # Max 256 2 0 2
         block = 'block4'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         block = 'block3_fused_block4'
@@ -587,12 +595,11 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block5'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
 
@@ -607,11 +614,11 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block6'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         block = 'block5_fused_block6'
@@ -625,11 +632,11 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block7'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
 
@@ -639,11 +646,11 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block8'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
         # Block7
@@ -652,11 +659,11 @@ def ssd_net(inputs,
         # Max 384 2 0 2
         block = 'block9'
         with tf.compat.v1.variable_scope(block):
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_1', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_2', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_3', padding='SAME')
-          net = slim.conv2d(net, 256, [3, 3], stride=1, scope='conv3x3_4', padding='SAME')
-          net = slim.max_pool2d(net, [2, 2], stride=2, scope='pool')
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_1')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_2')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_3')(net)
+          net = Conv2D(256, (3, 3), activation='relu', strides=1, padding='same', kernel_initializer='he_normal', name='conv3x3_4')(net)
+          net = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), padding='same', name='pool1')(net)
           end_points[block] = net
 
 
