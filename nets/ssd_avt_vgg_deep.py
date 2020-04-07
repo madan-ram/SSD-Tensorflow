@@ -243,7 +243,7 @@ class SSDNet(object):
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_avt_vgg_deep'):
+            scope='ssd_avt_vgg'):
         """Network definition.
         """
         r = ssd_net(inputs,
@@ -513,13 +513,13 @@ def ssd_net(inputs,
             dropout_keep_prob=0.5,
             prediction_fn=slim.softmax,
             reuse=None,
-            scope='ssd_avt_vgg_deep'):
+            scope='ssd_avt_vgg'):
     """SSD net definition.
     """
 
     # End_points collect relevant activations for external use.
     end_points = {}
-    with tf.compat.v1.variable_scope(scope, 'ssd_avt_vgg_deep', [inputs], reuse=reuse):
+    with tf.compat.v1.variable_scope(scope, 'ssd_avt_vgg', [inputs], reuse=reuse):
         # Block1
         # Conv  32  2 0 3
         # Conv  32  1 0 3
