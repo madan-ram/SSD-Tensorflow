@@ -181,8 +181,8 @@ tf.app.flags.DEFINE_boolean(
 FLAGS = tf.app.flags.FLAGS
 
 
-# tf.app.flags.DEFINE_float(
-#     'use_tpu', -1, 'Use TPU compution')
+tf.app.flags.DEFINE_float(
+    'use_tpu', -1, 'Use TPU compution')
 
 try:
     device_name = os.environ['COLAB_TPU_ADDR']
