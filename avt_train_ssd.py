@@ -180,6 +180,18 @@ tf.app.flags.DEFINE_boolean(
 FLAGS = tf.app.flags.FLAGS
 
 
+# tf.app.flags.DEFINE_float(
+#     'use_tpu', -1, 'Use TPU compution')
+
+try:
+    device_name = os.environ['COLAB_TPU_ADDR']
+    TPU_ADDRESS = 'grpc://' + device_name
+    print('Found TPU at: {}'.format(TPU_ADDRESS))
+    FLAGS.use_tpu = 1
+except KeyError:
+    FLAGS.use_tpu = -1
+    print('TPU not found')
+
 # =========================================================================== #
 # Main training routine.
 # =========================================================================== #
@@ -210,6 +222,16 @@ def main(_):
         ssd_class = nets_factory.get_network(FLAGS.model_name)
         ssd_params = ssd_class.default_params._replace(num_classes=FLAGS.num_classes)
         ssd_net = ssd_class(ssd_params)
+
+        if FLAGS.use_tpu == 1:
+            ssd_net = tf.contrib.tpu.keras_to_tpu_model(
+                ssd_net,
+                strategy=tf.contrib.tpu.TPUDistributionStrategy(
+                tf.contrib.cluster_resolver.TPUClusterResolver(
+                tpu='grpc://' + os.environ['COLAB_TPU_ADDR'])
+                )
+            )
+
         ssd_shape = ssd_net.params.img_shape
         ssd_anchors = ssd_net.anchors(ssd_shape)
 
