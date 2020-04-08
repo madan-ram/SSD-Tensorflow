@@ -275,7 +275,8 @@ def preprocess_for_train(image, labels, bboxes,
         #     distorted_bounding_box_crop(image, labels, bboxes,
         #                                 min_object_covered=MIN_OBJECT_COVERED,
         #                                 aspect_ratio_range=CROP_RATIO_RANGE)
-
+        dst_image = image
+        
         if resize == Resize.NONE:
             # No resizing...
             pass
