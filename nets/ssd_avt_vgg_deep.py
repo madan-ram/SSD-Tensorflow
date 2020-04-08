@@ -40,7 +40,7 @@ from nets import ssd_common
 from tensorflow.python.ops import array_ops
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Lambda, Activation, Conv2D, MaxPooling2D, ZeroPadding2D, Reshape, Concatenate
+from tensorflow.keras.layers import Input, Lambda, Activation, Conv2D, MaxPooling2D, ZeroPadding2D, Reshape, Concatenate, Flatten
 
 def multiply_list_items(myList): 
       
