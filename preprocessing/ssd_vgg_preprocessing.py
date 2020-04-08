@@ -23,7 +23,9 @@ import tf_extended as tfe
 from tensorflow.python.ops import control_flow_ops
 
 from preprocessing import tf_image
-from nets import ssd_common
+# from nets import ssd_common
+
+from notebooks.visualization import plt_bboxes
 
 slim = tf.contrib.slim
 
@@ -35,8 +37,8 @@ Resize = IntEnum('Resize', ('NONE',                # Nothing!
 
 
 # Some training pre-processing parameters.
-BBOX_CROP_OVERLAP = 0.60         # Minimum overlap to keep a bbox after cropping.
-MIN_OBJECT_COVERED = 0.50
+BBOX_CROP_OVERLAP = 0.80         # Minimum overlap to keep a bbox after cropping.
+MIN_OBJECT_COVERED = 0.75
 CROP_RATIO_RANGE = (0.39, 0.6)  # Distortion ratio during cropping.
 EVAL_SIZE = (1024, 1024)
 
@@ -221,8 +223,15 @@ def distorted_bounding_box_crop(image,
 
         # Crop the image to the specified bounding box.
         cropped_image = tf.slice(image, bbox_begin, bbox_size)
+
+        for batch in distort_bbox:
+            for y_min, x_min, y_max, x_max in batch:
+                print(y_min, x_min, y_max, x_max, image.get_shape(), cropped_image.get_shape())
+        
         # Restore the shape since the dynamic slice loses 3rd dimension.
         cropped_image.set_shape([None, None, 3])
+        
+        plt_bboxes(cropped_image, [0 for _ in range(len(distort_bbox))], [1.0 for _ in range(len(distort_bbox))], distort_bbox)
 
         # Update bounding boxes: resize and filter out.
         bboxes = tfe.bboxes_resize(distort_bbox, bboxes)
@@ -262,10 +271,10 @@ def preprocess_for_train(image, labels, bboxes,
         tf_summary_image(image, bboxes, 'image_with_bboxes')
 
 
-        dst_image, labels, bboxes, distort_bbox = \
-            distorted_bounding_box_crop(image, labels, bboxes,
-                                        min_object_covered=MIN_OBJECT_COVERED,
-                                        aspect_ratio_range=CROP_RATIO_RANGE)
+        # dst_image, labels, bboxes, distort_bbox = \
+        #     distorted_bounding_box_crop(image, labels, bboxes,
+        #                                 min_object_covered=MIN_OBJECT_COVERED,
+        #                                 aspect_ratio_range=CROP_RATIO_RANGE)
 
         if resize == Resize.NONE:
             # No resizing...
