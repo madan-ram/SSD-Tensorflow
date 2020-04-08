@@ -64,7 +64,6 @@ arg_scopes_map = {
 
 networks_obj = {
                 'ssd_avt_vgg_deep': ssd_avt_vgg_deep.SSDNet,
-                'ssd_avt_vgg_small': ssd_avt_vgg_small.SSDNet,
                 'ssd_resnet_v2': ssd_resnet_v2.SSDNet,
               }
 
