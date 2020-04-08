@@ -25,10 +25,6 @@ import tensorflow as tf
 from nets import vgg
 # from nets import xception
 
-from nets import ssd_vgg_300
-from nets import ssd_vgg_512
-from nets import ssd_vgg_doc
-
 from nets import ssd_avt_vgg
 from nets import ssd_avt_vgg_deep
 from nets import ssd_avt_vgg_small
@@ -39,10 +35,6 @@ slim = tf.contrib.slim
 networks_map = {'vgg_a': vgg.vgg_a,
                 'vgg_16': vgg.vgg_16,
                 'vgg_19': vgg.vgg_19,
-                'ssd_300_vgg': ssd_vgg_300.ssd_net,
-                'ssd_300_vgg_caffe': ssd_vgg_300.ssd_net,
-                'ssd_512_vgg': ssd_vgg_512.ssd_net,
-                'ssd_512_vgg_caffe': ssd_vgg_512.ssd_net,
 
                 'ssd_avt_vgg': ssd_avt_vgg.ssd_net,
                 'ssd_avt_vgg_caffe': ssd_avt_vgg.ssd_net,
@@ -60,32 +52,28 @@ networks_map = {'vgg_a': vgg.vgg_a,
                 }
 
 arg_scopes_map = {
-                  'vgg_a': vgg.vgg_arg_scope,
-                  'vgg_16': vgg.vgg_arg_scope,
-                  'vgg_19': vgg.vgg_arg_scope,
-                  'ssd_300_vgg': ssd_vgg_300.ssd_arg_scope,
-                  'ssd_300_vgg_caffe': ssd_vgg_300.ssd_arg_scope_caffe,
-                  
-                  'ssd_avt_vgg': ssd_avt_vgg.ssd_arg_scope,
-                  'ssd_avt_vgg_caffe': ssd_avt_vgg.ssd_arg_scope_caffe,
-                  
-                  'ssd_avt_vgg_deep': ssd_avt_vgg_deep.ssd_arg_scope,
-                  'ssd_avt_vgg_deep_caffe': ssd_avt_vgg_deep.ssd_arg_scope_caffe,
-                  
-                  'ssd_avt_vgg_small': ssd_avt_vgg_small.ssd_arg_scope,
-                  'ssd_avt_vgg_small_caffe': ssd_avt_vgg_small.ssd_arg_scope_caffe,
-                  
-                  'ssd_resnet_v2': ssd_resnet_v2.ssd_arg_scope,
-                  'ssd_resnet_v2_caffe': ssd_resnet_v2.ssd_arg_scope_caffe,
-                }
-
-networks_obj = {'ssd_300_vgg': ssd_vgg_300.SSDNet,
-                'ssd_512_vgg': ssd_vgg_512.SSDNet,
+                'vgg_a': vgg.vgg_arg_scope,
+                'vgg_16': vgg.vgg_arg_scope,
+                'vgg_19': vgg.vgg_arg_scope,
                 
+                'ssd_avt_vgg': ssd_avt_vgg.ssd_arg_scope,
+                'ssd_avt_vgg_caffe': ssd_avt_vgg.ssd_arg_scope_caffe,
+                
+                'ssd_avt_vgg_deep': ssd_avt_vgg_deep.ssd_arg_scope,
+                'ssd_avt_vgg_deep_caffe': ssd_avt_vgg_deep.ssd_arg_scope_caffe,
+                
+                'ssd_avt_vgg_small': ssd_avt_vgg_small.ssd_arg_scope,
+                'ssd_avt_vgg_small_caffe': ssd_avt_vgg_small.ssd_arg_scope_caffe,
+                
+                'ssd_resnet_v2': ssd_resnet_v2.ssd_arg_scope,
+                'ssd_resnet_v2_caffe': ssd_resnet_v2.ssd_arg_scope_caffe,
+              }
+
+networks_obj = {
                 'ssd_avt_vgg_deep': ssd_avt_vgg_deep.SSDNet,
                 'ssd_avt_vgg_small': ssd_avt_vgg_small.SSDNet,
                 'ssd_resnet_v2': ssd_resnet_v2.SSDNet,
-                }
+              }
 
 
 def get_network(name):
