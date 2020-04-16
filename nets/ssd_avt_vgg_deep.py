@@ -205,8 +205,8 @@ class SSDNet(object):
     default_params = SSDParams(
         feat_layers=['block3', 'block4', 'block5', 'block6', 'block7', 'block8', 'block9'],
         img_shape=(1024, 1024),
-        num_classes=4,
-        no_annotation_label=4,
+        num_classes=5,
+        no_annotation_label=5,
         feat_shapes=[(64, 64), (32, 32), (16, 16), (8, 8), (4, 4), (2, 2), (1, 1)],
         anchor_size_bounds=anchor_size_bounds,
         anchor_sizes=anchor_sizes,
