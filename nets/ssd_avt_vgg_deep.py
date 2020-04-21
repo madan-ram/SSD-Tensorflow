@@ -195,7 +195,7 @@ class SSDNet(object):
     The default image size used to train this network is 512x512.
     """
     # Anchor box square sizes
-    anchor_size_bounds = [0.50, 0.50]
+    anchor_size_bounds = [0.50, 0.80]
     anchor_steps = [16, 32, 64, 128, 256, 512, 1024]
     avg_anchor_size_min = np.asarray(anchor_steps)*anchor_size_bounds[0]
     avg_anchor_size_max = np.asarray(anchor_steps)*anchor_size_bounds[1]
@@ -211,16 +211,16 @@ class SSDNet(object):
         anchor_size_bounds=anchor_size_bounds,
         anchor_sizes=anchor_sizes,
         # Using Kmean clustering find best average aspect ration (centroid)
-        anchor_ratios=[[1.5, 1.7, 2.2],
-                       [1.5, 1.7, 2.2],
-                       [1.7, 2.2, 2.7, 3.6, 4.7],
-                       [1.6, 2.5, 3.3, 4, 5.0],
-                       [1.6, 3.9, 7.7],
-                       [1.5, 3.7, 7.0, 12.4],
-                       [4.2, 6.3, 9.6]],
+        anchor_ratios=[[1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.],
+                       [1, 2, 3, 1/2., 1/3.]],
         anchor_steps=anchor_steps,
         anchor_offset=0.5,
-        normalizations=[-1, -1, -1, -1, -1, -1, -1],
+        normalizations=[20, -1, -1, -1, -1, -1, -1],
         prior_scaling=[0.1, 0.1, 0.2, 0.2]
         )
 

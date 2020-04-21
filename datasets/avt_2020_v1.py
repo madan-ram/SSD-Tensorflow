@@ -31,10 +31,11 @@ ITEMS_TO_DESCRIPTIONS = {
 }
 
 VOC_LABELS = {
-    'InvoiceDate': (0, 'date'),
+    'Background': (0, 'background'),
     'InvoiceTable': (1, 'table'),
     'InvoiceDescription': (2, 'string'),
-    'InvoiceAmount': (3, 'number')
+    'InvoiceAmount': (3, 'number'),
+    'InvoiceDate': (4, 'date'),
 }
 
 # Percentage sums to 1
